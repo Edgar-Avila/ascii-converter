@@ -1,3 +1,4 @@
+import os
 import cv2 as cv
 import numpy as np
 from curses import wrapper
@@ -14,10 +15,12 @@ class AsciiConverter:
                     for i in range(256)]
 
     def convert_and_save(self, out_path):
+        cols, rows = os.get_terminal_size()
         with open(out_path, 'w') as out_file:
+            out_file.write(f'{rows}, {cols}, {self.frame_count}\n')
             for frame in range(self.frame_count):
                 _, img = self.video.read()
-                small = cv.resize(img, (0, 0), fx=0.2, fy=0.2)
+                small = cv.resize(img, (cols-1, rows-1))
                 gray = cv.cvtColor(small, cv.COLOR_BGR2GRAY)
                 converted = [[self.map[val] for val in row] for row in gray]
                 for row in converted:

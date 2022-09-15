@@ -7,6 +7,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--filename', help='Name of the video that you want to pass to ascii')
     parser.add_argument('-s', '--shade', help='Level of shading: "binary", "normal", "extended"')
+    parser.add_argument('-o', '--out', help='Saves to file instead of showing ascii')
     args = parser.parse_args()
 
     # Check args
@@ -18,6 +19,7 @@ def main():
 
     # Define variables
     filename = args.filename
+    out_path = args.out or ''
     selected_shade_level = args.shade or 'normal'
     shade_levels = {
         'binary': '.@',
@@ -33,7 +35,10 @@ def main():
 
     # Convert
     converter = AsciiConverter(video, shades)
-    converter.convert_and_play()
+    if out_path:
+        converter.convert_and_save(out_path)
+    else:
+        converter.convert_and_play()
 
     # Exit
     video.release()
