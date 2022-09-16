@@ -1,6 +1,7 @@
 import cv2 as cv
 from converter import AsciiConverter
 import argparse
+from os.path import splitext
 
 def main():
     # Parse args
@@ -29,19 +30,27 @@ def main():
     shades = shade_levels[selected_shade_level]
 
     # Get video
-    video = cv.VideoCapture(filename)
-    if not video.isOpened():
-        raise RuntimeError('Filename was incorrect or not a video')
+    _, file_extension = splitext(filename)
+    print(file_extension)
+    converter = AsciiConverter(shades)
+    if file_extension in ('.mp4', '.mov', '.avi'):
+        video = cv.VideoCapture(filename)
+        if not video.isOpened():
+            raise RuntimeError('Filename was incorrect or not a video')
 
-    # Convert
-    converter = AsciiConverter(video, shades)
-    if out_path:
-        converter.convert_and_save(out_path)
-    else:
-        converter.convert_and_play()
+        # Convert
+        if out_path:
+            converter.convert_and_save(video, out_path)
+        else:
+            converter.convert_and_play(video)
 
-    # Exit
-    video.release()
+        # Exit video
+        video.release()
+    elif file_extension in ('.txt'):
+        converter.read_and_play(filename)
+
+    
+    # Exit all
     cv.destroyAllWindows()
 
 if __name__ == '__main__':
